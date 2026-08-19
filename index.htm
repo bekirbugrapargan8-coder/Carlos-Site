@@ -7,10 +7,11 @@
     <style>
         body { background-color: #1a1a1a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         .container { background-color: #2f3136; padding: 20px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .header { background: #202225; padding: 10px; border-radius: 10px; margin-bottom: 20px; }
-        .coin-display { color: #f1c40f; font-weight: bold; font-size: 20px; }
-        .slot-screen { font-size: 50px; background: #000; padding: 15px; border-radius: 10px; margin: 10px 0; border: 3px solid #7289da; }
-        .red-lever { width: 40px; height: 100px; background: #e74c3c; border-radius: 5px; margin: 10px auto; cursor: pointer; }
+        .header { background: #202225; padding: 10px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .coin-display { color: #f1c40f; font-weight: bold; font-size: 18px; }
+        .slot-screen { font-size: 40px; background: #000; padding: 15px; border-radius: 10px; margin: 10px 0; border: 3px solid #7289da; min-height: 60px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .red-lever { width: 40px; height: 100px; background: #e74c3c; border-radius: 5px; margin: 10px auto; cursor: pointer; transition: 0.1s; }
+        .red-lever:active { transform: translateY(10px); }
         .market-btn { background: #7289da; padding: 10px; margin: 5px; border-radius: 5px; cursor: pointer; border: none; color: white; width: 100%; }
         .save-btn { background: #43b581; padding: 10px; margin-top: 15px; width: 100%; border: none; color: white; cursor: pointer; font-weight: bold; }
     </style>
@@ -24,7 +25,8 @@
     </div>
 
     <!-- Slot Makinesi -->
-    <div class="slot-screen" id="slot">🎰</div>
+    <div class="slot-screen" id="slot">🎰🎰🎰</div>
+    <p>Kolu çevir!</p>
     <div class="red-lever" onclick="cevir()"></div>
 
     <!-- Market -->
@@ -34,10 +36,10 @@
         <button class="market-btn" onclick="alisveris('oyun2', 150)">2. Oyun (Çark) - 150 Coin</button>
     </div>
 
-    <!-- Çarkıfelek (2. Oyun) -->
+    <!-- Çarkıfelek -->
     <div id="cark-alani" style="display:none; margin-top:20px;">
         <h3>Çarkıfelek</h3>
-        <button class="market-btn" style="background:#e67e22;" onclick="carkCevir()">Çevir (50 Coin)</button>
+        <button class="market-btn" style="background:#e67e22;" onclick="carkCevir()">Çevir (Ücretsiz)</button>
     </div>
 
     <button class="save-btn" onclick="manuelKaydet()">Oyunu Kaydet</button>
@@ -47,6 +49,7 @@
     let coins = parseInt(localStorage.getItem("carloss_coins")) || 100;
     let sansBonusu = parseFloat(localStorage.getItem("sans_bonusu")) || 0;
     let oyun2Acik = localStorage.getItem("oyun2_acik") === "true";
+    const semboller = ["🍒", "🍋", "💎", "⭐", "🔔"];
 
     function guncelle() {
         document.getElementById("coin-val").innerText = coins + " Coin";
@@ -54,21 +57,23 @@
     }
 
     function cevir() {
-        if (coins < 10) { alert("Yetersiz coin!"); return; }
-        coins -= 10;
-        let semboller = ["🍒", "🍋", "💎", "⭐", "🔔"];
-        // Şans bonusu ile kazanma ihtimalini artırıyoruz
-        let kazanmaSansi = 0.15 + sansBonusu; 
+        // Rastgele 3 sembol seç
+        let s1 = semboller[Math.floor(Math.random() * semboller.length)];
+        let s2 = semboller[Math.floor(Math.random() * semboller.length)];
+        let s3 = semboller[Math.floor(Math.random() * semboller.length)];
         
-        setTimeout(() => {
-            if (Math.random() < kazanmaSansi) {
-                document.getElementById("slot").innerText = "💎💎💎";
-                coins += 150;
-            } else {
-                document.getElementById("slot").innerText = "🍒🍋⭐";
-            }
-            guncelle();
-        }, 500);
+        document.getElementById("slot").innerText = `${s1} ${s2} ${s3}`;
+
+        // Kazanma kontrolü (Şans bonusu eklenmiş hali)
+        if (s1 === s2 && s2 === s3) {
+            coins += 20;
+            alert("Kazandın! +20 Coin");
+        } else if (Math.random() < (0.5 - sansBonusu)) { // Kaybetme ihtimali
+            coins -= 20;
+            alert("Kaybettin! -20 Coin");
+        }
+        
+        guncelle();
     }
 
     function alisveris(tur, fiyat) {
@@ -84,9 +89,7 @@
     }
 
     function carkCevir() {
-        if (coins < 50) { alert("Yetersiz bakiye!"); return; }
-        coins -= 50;
-        let oduller = [20, 350, 0, 560, 29038]; // 0 = Pass
+        let oduller = [20, 350, 0, 560, 29038]; 
         let sonuc = oduller[Math.floor(Math.random() * oduller.length)];
         coins += sonuc;
         alert("Çark döndü: " + (sonuc === 0 ? "PAS!" : "+" + sonuc + " Coin kazandın!"));
