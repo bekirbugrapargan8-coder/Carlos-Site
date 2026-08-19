@@ -2,35 +2,88 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carloss Site - Giriş Yap</title>
     <style>
         body { background-color: #36393f; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background-color: #2f3136; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-align: center; width: 300px; }
-        h1 { color: #7289da; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 4px; border: none; background: #202225; color: white; }
-        button { width: 100%; padding: 10px; background-color: #7289da; border: none; color: white; border-radius: 4px; cursor: pointer; }
+        .card { background-color: #2f3136; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-align: center; width: 90%; max-width: 300px; }
+        h1 { color: #7289da; margin-bottom: 10px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 4px; border: none; background: #202225; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #7289da; border: none; color: white; border-radius: 4px; cursor: pointer; margin-top: 10px; }
         .profile-demo { margin-bottom: 20px; }
         .avatar { width: 80px; height: 80px; background-color: #40444b; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+        .site-tag { color: #b9bbbe; font-size: 14px; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-<div class="card">
+<div class="card" id="auth-card">
     <div class="profile-demo">
-        <div class="avatar">🎮</div> <!-- Discord tarzı profil ikonu -->
+        <div class="avatar">🎮</div>
     </div>
     <h1>Carloss Site</h1>
-    <input type="text" id="email" placeholder="E-posta">
-    <input type="password" id="password" placeholder="Şifre">
+    <input type="text" id="username" placeholder="Kullanıcı Adı (Örn: Carloss)" autocomplete="off">
+    <input type="email" id="email" placeholder="E-posta" autocomplete="off">
+    <input type="password" id="password" placeholder="Şifre" autocomplete="off">
     <button onclick="kayitOl()">Kayıt Ol</button>
 </div>
 
-<script>
-    function kayitOl() {
-        alert("Firebase bağlantısı bekleniyor! Şu an sadece test aşamasındayız.");
-        // Firebase kodları buraya eklenecek
+<!-- Giriş yapıldıktan sonra görünecek gizli alan -->
+<div class="card" id="profile-card" style="display: none;">
+    <div class="profile-demo">
+        <div class="avatar">😎</div>
+    </div>
+    <h1 id="welcome-text">Hoş geldin!</h1>
+    <!-- E-posta yerine carloss.web yazısı burada görünecek -->
+    <div class="site-tag" id="user-site-tag">carloss.web</div>
+    <p style="color: #b9bbbe; margin-top: 15px; font-size: 13px;">Sisteme başarıyla giriş yaptın.</p>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDxiGVSwsm4grl8emP5TQsurQl9dvaFXtA",
+      authDomain: "carloss-site.firebaseapp.com",
+      projectId: "carloss-site",
+      storageBucket: "carloss-site.firebasestorage.app",
+      messagingSenderId: "270092489801",
+      appId: "1:270092489801:web:ea4c9f19c979c8c00fdb98",
+      measurementId: "G-V78PJ9EX27"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.kayitOl = function() {
+        const username = document.getElementById("username").value;
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        if(!username) {
+            alert("Lütfen bir kullanıcı adı gir!");
+            return;
+        }
+
+        createUserWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+              updateProfile(userCredential.user, {
+                  displayName: username
+              }).then(() => {
+                  document.getElementById("auth-card").style.display = "none";
+                  document.getElementById("profile-card").style.display = "block";
+                  document.getElementById("welcome-text").innerText = "Hoş geldin, " + username + "!";
+                  // E-posta yerine kullanıcının adıyla birlikte carloss.web uzantısını gösterelim
+                  document.getElementById("user-site-tag").innerText = "@" + username + " • carloss.web";
+              });
+          })
+          .catch((error) => {
+              alert("Kayıt başarısız: " + error.message);
+          });
     }
 </script>
 
 </body>
 </html>
+
