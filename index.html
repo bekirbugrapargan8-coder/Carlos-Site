@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benim Sosyal Medya Sitem</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .chat-box { height: 300px; border: 1px solid #ccc; overflow-y: scroll; padding: 10px; margin-bottom: 10px; background: #fafafa; }
+        .message { margin-bottom: 10px; }
+        .kurucu { color: #d9534f; font-weight: bold; }
+        .yonetici { color: #f0ad4e; font-weight: bold; }
+        .uye { color: #337ab7; }
+        .badge { background: #0088cc; color: white; border-radius: 50%; padding: 2px 5px; font-size: 10px; }
+        input, button { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Sohbet Odası</h2>
+    
+    <!-- Sohbet Alanı -->
+    <div class="chat-box" id="chatBox">
+        <div class="message">
+            <span class="kurucu">Ahmet (Kurucu)</span> <span class="badge">✓</span>: Herkese selam! Sitemize hoş geldiniz.
+        </div>
+        <div class="message">
+            <span class="yonetici">Mehmet (Yönetici)</span>: Selam patron!
+        </div>
+        <div class="message">
+            <span class="uye">Can (Üye)</span>: Merhaba, VIP kısım nasıl açılıyor?
+        </div>
+    </div>
+
+    <!-- Mesaj Yazma Alanı -->
+    <input type="text" id="messageInput" placeholder="Mesajınızı yazın...">
+    <button onclick="sendMessage()">Gönder</button>
+</div>
+
+<script>
+    function sendMessage() {
+        var input = document.getElementById("messageInput");
+        var chatBox = document.getElementById("chatBox");
+        
+        if(input.value.trim() !== "") {
+            var newMsg = document.createElement("div");
+            newMsg.className = "message";
+            newMsg.innerHTML = `<span class="uye">Sen (Üye)</span>: ${input.value}`;
+            chatBox.appendChild(newMsg);
+            input.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    }
+</script>
+
+</body>
+  </html>
+  
