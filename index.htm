@@ -3,87 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carloss Site - Giriş Yap</title>
+    <title>Carloss Coin Oyunu</title>
     <style>
-        body { background-color: #36393f; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background-color: #2f3136; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-align: center; width: 90%; max-width: 300px; }
-        h1 { color: #7289da; margin-bottom: 10px; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 4px; border: none; background: #202225; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background-color: #7289da; border: none; color: white; border-radius: 4px; cursor: pointer; margin-top: 10px; }
-        .profile-demo { margin-bottom: 20px; }
-        .avatar { width: 80px; height: 80px; background-color: #40444b; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 30px; }
-        .site-tag { color: #b9bbbe; font-size: 14px; margin-top: 5px; }
+        body { background-color: #202225; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background-color: #2f3136; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); text-align: center; width: 90%; max-width: 350px; }
+        .header { display: flex; align-items: center; justify-content: space-between; background: #36393f; padding: 10px 15px; border-radius: 8px; margin-bottom: 20px; }
+        .avatar { width: 40px; height: 40px; background-color: #7289da; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .user-info { text-align: left; }
+        .username { font-weight: bold; font-size: 14px; color: #fff; }
+        .coin-count { font-size: 13px; color: #faa61a; }
+        h1 { color: #7289da; font-size: 22px; margin-bottom: 10px; }
+        p { color: #b9bbbe; font-size: 14px; margin-bottom: 20px; }
+        button { width: 100%; padding: 12px; background-color: #43b581; border: none; color: white; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        button:active { transform: scale(0.98); }
+        button:hover { background-color: #3ca374; }
+        #message { margin-top: 15px; font-weight: bold; font-size: 15px; min-height: 20px; }
     </style>
 </head>
 <body>
 
-<div class="card" id="auth-card">
-    <div class="profile-demo">
-        <div class="avatar">🎮</div>
+<div class="card">
+    <!-- Üst Kısım: Profil ve Coin Göstergesi -->
+    <div class="header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="avatar">👑</div>
+            <div class="user-info">
+                <div class="username" id="display-name">Carloss</div>
+                <div class="coin-count" id="display-coins">100 Coin</div>
+            </div>
+        </div>
     </div>
-    <h1>Carloss Site</h1>
-    <input type="text" id="username" placeholder="Kullanıcı Adı (Örn: Carloss)" autocomplete="off">
-    <input type="email" id="email" placeholder="E-posta" autocomplete="off">
-    <input type="password" id="password" placeholder="Şifre" autocomplete="off">
-    <button onclick="kayitOl()">Kayıt Ol</button>
+
+    <h1>Coin Avı</h1>
+    <p>Şansını dene! Her tıklama 20 coin harcar, şansına göre kazanır veya kaybedersin.</p>
+
+    <button onclick="oyna()">Şansını Dene (20 Coin)</button>
+    
+    <div id="message"></div>
 </div>
 
-<!-- Giriş yapıldıktan sonra görünecek gizli alan -->
-<div class="card" id="profile-card" style="display: none;">
-    <div class="profile-demo">
-        <div class="avatar">😎</div>
-    </div>
-    <h1 id="welcome-text">Hoş geldin!</h1>
-    <!-- E-posta yerine carloss.web yazısı burada görünecek -->
-    <div class="site-tag" id="user-site-tag">carloss.web</div>
-    <p style="color: #b9bbbe; margin-top: 15px; font-size: 13px;">Sisteme başarıyla giriş yaptın.</p>
-</div>
+<script>
+    // Kullanıcı adını ve coin miktarını hafızadan al (Yoksa ilk defa 100 coin ver)
+    let username = "Carloss";
+    let coins = localStorage.getItem("carloss_coins");
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    if (coins === null) {
+        coins = 100; // Başlangıç coin'i
+        localStorage.setItem("carloss_coins", coins);
+    } else {
+        coins = parseInt(coins);
+    }
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDxiGVSwsm4grl8emP5TQsurQl9dvaFXtA",
-      authDomain: "carloss-site.firebaseapp.com",
-      projectId: "carloss-site",
-      storageBucket: "carloss-site.firebasestorage.app",
-      messagingSenderId: "270092489801",
-      appId: "1:270092489801:web:ea4c9f19c979c8c00fdb98",
-      measurementId: "G-V78PJ9EX27"
-    };
+    // Ekranı güncelle
+    document.getElementById("display-name").innerText = username;
+    document.getElementById("display-coins").innerText = coins + " Coin";
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    function oyna() {
+        const msg = document.getElementById("message");
 
-    window.kayitOl = function() {
-        const username = document.getElementById("username").value;
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
-
-        if(!username) {
-            alert("Lütfen bir kullanıcı adı gir!");
+        if (coins < 20) {
+            msg.style.color = "#f04747";
+            msg.innerText = "Yetersiz coin! Cüzdanın boşaldı.";
             return;
         }
 
-        createUserWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-              updateProfile(userCredential.user, {
-                  displayName: username
-              }).then(() => {
-                  document.getElementById("auth-card").style.display = "none";
-                  document.getElementById("profile-card").style.display = "block";
-                  document.getElementById("welcome-text").innerText = "Hoş geldin, " + username + "!";
-                  // E-posta yerine kullanıcının adıyla birlikte carloss.web uzantısını gösterelim
-                  document.getElementById("user-site-tag").innerText = "@" + username + " • carloss.web";
-              });
-          })
-          .catch((error) => {
-              alert("Kayıt başarısız: " + error.message);
-          });
+        // 20 coin düş
+        coins -= 20;
+
+        // Rastgele şans (0 ile 1 arası): %50 kazanma, %50 kaybetme şansı
+        let sans = Math.random();
+
+        if (sans > 0.5) {
+            // Kazandı! (Yatırımdan fazla kazanç: 40 coin verelim)
+            let kazanilan = 40;
+            coins += kazanilan;
+            msg.style.color = "#43b581";
+            msg.innerText = `Tebrikler! 🎉 +${kazanilan} Coin kazandın!`;
+        } else {
+            // Kaybetti
+            msg.style.color = "#f04747";
+            msg.innerText = "Eyvah, kaybettin! 😢 20 coin gitti.";
+        }
+
+        // Hafızaya (localStorage) kaydet ki sayfa yenilenince gitmesin
+        localStorage.setItem("carloss_coins", coins);
+
+        // Ekrandaki sayıyı güncelle
+        document.getElementById("display-coins").innerText = coins + " Coin";
     }
 </script>
 
 </body>
 </html>
-
