@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carloss Slot</title>
+    <title>Carloss Casino</title>
     <style>
-        body { background-color: #1a1a1a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background-color: #2f3136; padding: 20px; border-radius: 15px; text-align: center; width: 90%; max-width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .header { display: flex; align-items: center; justify-content: space-between; background: #202225; padding: 10px; border-radius: 10px; margin-bottom: 20px; }
-        .coin-display { color: #f1c40f; font-weight: bold; }
-        /* Slot Makinesi Ekranı */
-        .slot-screen { font-size: 50px; background: #000; padding: 20px; border-radius: 10px; margin: 20px 0; border: 4px solid #7289da; }
-        /* Kırmızı Kol */
-        .red-lever { width: 40px; height: 120px; background: #e74c3c; border-radius: 5px; margin: 0 auto; cursor: pointer; transition: 0.2s; border: 2px solid #c0392b; }
-        .red-lever:active { background: #c0392b; transform: translateY(10px); }
-        .info { font-size: 12px; color: #999; margin-top: 10px; }
+        body { background-color: #1a1a1a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background-color: #2f3136; padding: 20px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .header { background: #202225; padding: 10px; border-radius: 10px; margin-bottom: 20px; }
+        .coin-display { color: #f1c40f; font-weight: bold; font-size: 20px; }
+        .slot-screen { font-size: 50px; background: #000; padding: 15px; border-radius: 10px; margin: 10px 0; border: 3px solid #7289da; }
+        .red-lever { width: 40px; height: 100px; background: #e74c3c; border-radius: 5px; margin: 10px auto; cursor: pointer; }
+        .market-btn { background: #7289da; padding: 10px; margin: 5px; border-radius: 5px; cursor: pointer; border: none; color: white; width: 100%; }
+        .save-btn { background: #43b581; padding: 10px; margin-top: 15px; width: 100%; border: none; color: white; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -25,43 +23,82 @@
         <div class="coin-display" id="coin-val">100 Coin</div>
     </div>
 
+    <!-- Slot Makinesi -->
     <div class="slot-screen" id="slot">🎰</div>
-    
-    <p>Döndürmek için kırmızı kola bas!</p>
     <div class="red-lever" onclick="cevir()"></div>
-    <div class="info">Her çevirme: 10 Coin</div>
+
+    <!-- Market -->
+    <div style="margin-top:20px;">
+        <h3>Market</h3>
+        <button class="market-btn" onclick="alisveris('sans', 250)">Şans Artır (%25) - 250 Coin</button>
+        <button class="market-btn" onclick="alisveris('oyun2', 150)">2. Oyun (Çark) - 150 Coin</button>
+    </div>
+
+    <!-- Çarkıfelek (2. Oyun) -->
+    <div id="cark-alani" style="display:none; margin-top:20px;">
+        <h3>Çarkıfelek</h3>
+        <button class="market-btn" style="background:#e67e22;" onclick="carkCevir()">Çevir (50 Coin)</button>
+    </div>
+
+    <button class="save-btn" onclick="manuelKaydet()">Oyunu Kaydet</button>
 </div>
 
 <script>
-    let coins = localStorage.getItem("carloss_coins") ? parseInt(localStorage.getItem("carloss_coins")) : 100;
-    const semboller = ["🍒", "🍋", "💎", "⭐", "🔔"];
-    
-    document.getElementById("coin-val").innerText = coins + " Coin";
+    let coins = parseInt(localStorage.getItem("carloss_coins")) || 100;
+    let sansBonusu = parseFloat(localStorage.getItem("sans_bonusu")) || 0;
+    let oyun2Acik = localStorage.getItem("oyun2_acik") === "true";
+
+    function guncelle() {
+        document.getElementById("coin-val").innerText = coins + " Coin";
+        if(oyun2Acik) document.getElementById("cark-alani").style.display = "block";
+    }
 
     function cevir() {
-        if (coins < 10) { alert("Yeterli coin yok!"); return; }
-        
+        if (coins < 10) { alert("Yetersiz coin!"); return; }
         coins -= 10;
-        document.getElementById("slot").innerText = "⏳"; // Dönüyor gibi yap
-
+        let semboller = ["🍒", "🍋", "💎", "⭐", "🔔"];
+        // Şans bonusu ile kazanma ihtimalini artırıyoruz
+        let kazanmaSansi = 0.15 + sansBonusu; 
+        
         setTimeout(() => {
-            let s1 = semboller[Math.floor(Math.random() * semboller.length)];
-            let s2 = semboller[Math.floor(Math.random() * semboller.length)];
-            let s3 = semboller[Math.floor(Math.random() * semboller.length)];
-            
-            document.getElementById("slot").innerText = `${s1}${s2}${s3}`;
-
-            if (s1 === s2 && s2 === s3) {
-                let odul = (s1 === "💎") ? 500 : 100; // Elmas gelirse büyük ikramiye
-                coins += odul;
-                alert("BÜYÜK KAZANÇ! +" + odul);
+            if (Math.random() < kazanmaSansi) {
+                document.getElementById("slot").innerText = "💎💎💎";
+                coins += 150;
+            } else {
+                document.getElementById("slot").innerText = "🍒🍋⭐";
             }
-
-            localStorage.setItem("carloss_coins", coins);
-            document.getElementById("coin-val").innerText = coins + " Coin";
+            guncelle();
         }, 500);
     }
-</script>
 
+    function alisveris(tur, fiyat) {
+        if (coins < fiyat) { alert("Yetersiz bakiye!"); return; }
+        coins -= fiyat;
+        if(tur === 'sans') sansBonusu += 0.25;
+        if(tur === 'oyun2') oyun2Acik = true;
+        
+        localStorage.setItem("oyun2_acik", oyun2Acik);
+        localStorage.setItem("sans_bonusu", sansBonusu);
+        guncelle();
+        alert("Satın alındı!");
+    }
+
+    function carkCevir() {
+        if (coins < 50) { alert("Yetersiz bakiye!"); return; }
+        coins -= 50;
+        let oduller = [20, 350, 0, 560, 29038]; // 0 = Pass
+        let sonuc = oduller[Math.floor(Math.random() * oduller.length)];
+        coins += sonuc;
+        alert("Çark döndü: " + (sonuc === 0 ? "PAS!" : "+" + sonuc + " Coin kazandın!"));
+        guncelle();
+    }
+
+    function manuelKaydet() {
+        localStorage.setItem("carloss_coins", coins);
+        alert("Oyun kaydedildi!");
+    }
+
+    guncelle();
+</script>
 </body>
 </html>
